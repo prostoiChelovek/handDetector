@@ -33,7 +33,7 @@ int main()
 		mask = hd.detectHands_range(imgHSV, lower, upper);
 		hd.getFingers();
 		hd.getCenters();
-		hd.getHigherFingerstips();
+		hd.getHigherFingers();
 		hd.drawHands(frame, Scalar(255, 0, 100), 2);
 
 		imshow("hands", frame);
