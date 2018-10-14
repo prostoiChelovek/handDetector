@@ -13,8 +13,6 @@ class Finger
 {
  public:
 	Point ptStart, ptEnd, ptFar;
-	Vec4i v;
-	vector<Point> cnt;
 
 	double angle, inAngle, length;
 	float depth;
@@ -27,15 +25,13 @@ class Finger
 
 	Finger() {}
 
-	Finger(const Vec4i &v_, const vector<Point> &cnt_, const Rect &boundingBox_)
+	Finger(const Vec4i &v, const vector<Point> &cnt, const Rect &boundingBox_)
 	{
-		v = v_;
-		cnt = cnt_;
 		boundingBox = boundingBox_;
 		depth = v[3] / 256;
 
-		getPoints();
-		countAngles();
+		getPoints(cnt, v);
+		countAngles(v);
 
 		check();
 	}
@@ -59,7 +55,7 @@ class Finger
 		return ok;
 	}
 
-	void getPoints()
+	void getPoints(vector<Point> cnt, Vec4i v)
 	{
 		int startidx = v[0];
 		ptStart = Point(cnt[startidx]);
@@ -70,7 +66,7 @@ class Finger
 	}
 
 	// For use it, firstly call getPoints()
-	void countAngles()
+	void countAngles(Vec4i v)
 	{
 		Point center = Point(boundingBox.x + boundingBox.width / 2,
 									boundingBox.y + boundingBox.height / 2);
