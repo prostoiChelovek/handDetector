@@ -22,6 +22,7 @@ public:
     double area;
     Size areaLimits = Size(50 * 50, 800 * 800);
     Finger higherFinger;
+    Finger farthestFinger;
     bool ok = false;
     bool shouldCheckSize = false;
 
@@ -35,7 +36,9 @@ public:
 
     void getFingers();
 
-    void gethigherFinger();
+    void getHigherFinger();
+
+    void getFarthestFinger();
 
     void drawFingers(Mat &img, Scalar color = Scalar(255, 0, 100), int thickness = 2);
 

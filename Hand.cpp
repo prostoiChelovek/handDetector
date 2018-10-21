@@ -39,7 +39,7 @@ void Hand::getFingers() {
         ok = false;
 }
 
-void Hand::gethigherFinger() {
+void Hand::getHigherFinger() {
     Point higher(fingers[0].ptStart.x, fingers[0].ptStart.y);
     Finger hf = fingers[0];
     for (Finger &f : fingers) {
@@ -48,15 +48,29 @@ void Hand::gethigherFinger() {
             hf = f;
         }
     }
-    if (higher.x != -1) {
-        higherFinger = hf;
+    higherFinger = hf;
+}
+
+// for use it, first call getCenter
+void Hand::getFarthestFinger() {
+    double farthest = -1;
+    double dist;
+    Finger ff = fingers[0];
+    for (Finger &f : fingers) {
+        dist = getDist(center, f.ptStart);
+        if (dist > farthest) {
+            farthest = dist;
+            ff = f;
+        }
     }
+    farthestFinger = ff;
 }
 
 void Hand::drawFingers(Mat &img, Scalar color, int thickness) {
     for (Finger &f : fingers) {
         f.draw(img, color, thickness);
-        circle(img, higherFinger.ptStart, 10, Scalar(0, 0, 255), thickness);
+        // circle(img, higherFinger.ptStart, 10, Scalar(0, 0, 255), thickness);
+        circle(img, farthestFinger.ptStart, 10, Scalar(0, 255, 255), thickness);
     }
 }
 

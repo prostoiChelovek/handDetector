@@ -96,7 +96,14 @@ void HandDetector::getFingers() {
 
 void HandDetector::getHigherFingers() {
     for (Hand &h : hands) {
-        h.gethigherFinger();
+        h.getHigherFinger();
+    }
+}
+
+void HandDetector::getFarthestFingers() {
+    for (Hand &h : hands) {
+        h.getCenter();
+        h.getFarthestFinger();
     }
 }
 

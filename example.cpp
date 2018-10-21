@@ -31,6 +31,8 @@ int main()
         hd.getFingers();
         hd.getCenters();
         hd.getHigherFingers();
+        hd.getFarthestFingers();
+
         hd.drawHands(frame, Scalar(255, 0, 100), 2);
 
         imshow("hands", frame);

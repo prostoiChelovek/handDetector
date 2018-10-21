@@ -45,6 +45,8 @@ public:
 
     void getHigherFingers();
 
+    void getFarthestFingers();
+
     void getCenters();
 
     void checkHands();
