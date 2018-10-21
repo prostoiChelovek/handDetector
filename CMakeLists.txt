@@ -23,6 +23,9 @@ set_target_properties(handDetector_static PROPERTIES OUTPUT_NAME "handDetector")
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
+target_link_libraries(handDetector_dynamic ${OpenCV_LIBS})
+target_link_libraries(handDetector_static ${OpenCV_LIBS})
+
 install(TARGETS handDetector_dynamic handDetector_static
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
