@@ -47,7 +47,6 @@ public:
     void getFingers();
 
     void getHigherFingers();
-
     void getFarthestFingers();
 
     void getCenters();

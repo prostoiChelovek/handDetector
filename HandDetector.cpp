@@ -102,7 +102,6 @@ void HandDetector::getHigherFingers() {
 
 void HandDetector::getFarthestFingers() {
     for (Hand &h : hands) {
-        h.getCenter();
         h.getFarthestFinger();
     }
 }

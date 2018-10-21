@@ -53,13 +53,12 @@ void Hand::getHigherFinger() {
     higherFinger = hf;
 }
 
-// for use it, first call getCenter
 void Hand::getFarthestFinger() {
     double farthest = -1;
     double dist;
     Finger ff = fingers[0];
     for (Finger &f : fingers) {
-        dist = getDist(center, f.ptStart);
+        dist = getDist(f.ptFar, f.ptStart);
         if (dist > farthest) {
             farthest = dist;
             ff = f;
