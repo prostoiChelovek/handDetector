@@ -29,7 +29,8 @@ public:
 
     Finger();
 
-    Finger(const Vec4i &v, const vector<Point> &cnt, const Rect &boundingBox_);
+    Finger(const Vec4i &v, const vector<Point> &cnt, const Rect &boundingBox_,
+           bool shouldCheckAngles_ = true);
 
     bool checkDepth();
 

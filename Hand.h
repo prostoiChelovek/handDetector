@@ -24,9 +24,11 @@ public:
     Finger higherFinger;
     Finger farthestFinger;
     bool ok = false;
-    bool shouldCheckSize = false;
+    bool shouldCheckSize = true;
+    bool shouldCheckAngles = true;
 
-    explicit Hand(vector<Point> contour_);
+    explicit Hand(vector<Point> contour_, bool shouldCheckSize_ = true,
+                  bool shouldCheckAngles_ = true);
 
     bool checkSize();
 

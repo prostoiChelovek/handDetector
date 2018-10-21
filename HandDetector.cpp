@@ -27,7 +27,7 @@ void HandDetector::findHandsContours(Mat img) {
     vector<Vec4i> hierarchy;
     findContours(img, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
     for (const auto &contour : contours) {
-        Hand h(contour);
+        Hand h(contour, shouldCheckSize, shouldCheckAngles);
         h.getBr();
         for (Hand hnd : hands) {
             if (contourArea(h.contour) < contourArea(hnd.contour) &&

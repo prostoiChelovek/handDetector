@@ -2,9 +2,12 @@
 
 Finger::Finger() = default;
 
-Finger::Finger(const Vec4i &v, const vector<Point> &cnt, const Rect &boundingBox_) {
+Finger::Finger(const Vec4i &v, const vector<Point> &cnt, const Rect &boundingBox_,
+               bool shouldCheckAngles_) {
     boundingBox = boundingBox_;
     depth = v[3] / 256;
+
+    shouldCheckAngles = shouldCheckAngles_;
 
     getPoints(cnt, v);
     countAngles();
@@ -18,7 +21,11 @@ bool Finger::checkDepth() {
 }
 
 bool Finger::checkAngles() {
-    ok = (angle > -30 && angle < 160 && abs(inAngle) > 20 && abs(inAngle) < 120 && length > 0.1 * boundingBox.height);
+    if (shouldCheckAngles)
+        ok = (angle > -30 && angle < 160 && abs(inAngle) > 20 && abs(inAngle) < 120 &&
+              length > 0.1 * boundingBox.height);
+    else
+        ok = true;
     return ok;
 }
 

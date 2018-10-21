@@ -3,10 +3,12 @@
 using namespace cv;
 using namespace std;
 
-Hand::Hand(vector<Point> contour_) {
+Hand::Hand(vector<Point> contour_, bool shouldCheckSize_, bool shouldCheckAngles_) {
     contour = move(contour_);
     moment = moments((Mat) contour);
     area = moment.m00;
+    shouldCheckSize = shouldCheckSize_;
+    shouldCheckAngles = shouldCheckAngles_;
 }
 
 bool Hand::checkSize() {
@@ -31,7 +33,7 @@ void Hand::getFingers() {
         convexHull(contour, hullI, false);
         convexityDefects(contour, hullI, defects);
         for (const Vec4i &v : defects) {
-            Finger f = Finger(v, contour, border);
+            Finger f = Finger(v, contour, border, shouldCheckAngles);
             if (f.ok)
                 fingers.push_back(f);
         }

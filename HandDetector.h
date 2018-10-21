@@ -27,6 +27,9 @@ public:
     bool cascadeLoaded = false;
     int cascade_thresh_sens_val = 20;
 
+    bool shouldCheckSize = true;
+    bool shouldCheckAngles = true;
+
     HandDetector();
 
     void mask_morph(Mat &mask);
