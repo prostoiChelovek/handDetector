@@ -58,7 +58,7 @@ void Hand::getFarthestFinger() {
     double dist;
     Finger ff = fingers[0];
     for (Finger &f : fingers) {
-        dist = getDist(f.ptFar, f.ptStart);
+        dist = getDist(f.ptFar, f.ptEnd);
         if (dist > farthest) {
             farthest = dist;
             ff = f;
@@ -70,7 +70,7 @@ void Hand::getFarthestFinger() {
 void Hand::drawFingers(Mat &img, Scalar color, int thickness) {
     for (Finger &f : fingers) {
         f.draw(img, color, thickness);
-        // circle(img, higherFinger.ptStart, 10, Scalar(0, 0, 255), thickness);
+        circle(img, higherFinger.ptStart, 10, Scalar(0, 0, 255), thickness);
         circle(img, farthestFinger.ptStart, 10, Scalar(0, 255, 255), thickness);
     }
 }

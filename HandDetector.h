@@ -32,8 +32,6 @@ public:
 
     HandDetector();
 
-    void mask_morph(Mat &mask);
-
     bool loadCascade(String path);
 
     void findHandsContours(Mat img);

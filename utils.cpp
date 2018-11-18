@@ -34,3 +34,12 @@ float innerAngle(float px1, float py1, float px2, float py2, float cx1, float cy
 double getDist(Point a, Point b) {
     return sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
 }
+
+void mask_morph(Mat &mask) {
+    Mat erodeElement = getStructuringElement(MORPH_RECT, Size(3, 3));
+    Mat dilateElement = getStructuringElement(MORPH_RECT, Size(8, 8));
+    erode(mask, mask, erodeElement);
+    erode(mask, mask, erodeElement);
+    dilate(mask, mask, dilateElement);
+    dilate(mask, mask, dilateElement);
+}

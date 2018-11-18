@@ -5,15 +5,6 @@ using namespace std;
 
 HandDetector::HandDetector() = default;
 
-void HandDetector::mask_morph(Mat &mask) {
-    Mat erodeElement = getStructuringElement(MORPH_RECT, Size(3, 3));
-    Mat dilateElement = getStructuringElement(MORPH_RECT, Size(8, 8));
-    erode(mask, mask, erodeElement);
-    erode(mask, mask, erodeElement);
-    dilate(mask, mask, dilateElement);
-    dilate(mask, mask, dilateElement);
-}
-
 bool HandDetector::loadCascade(String path) {
     if (cascadePath.empty())
         cascadePath = path;
@@ -29,18 +20,8 @@ void HandDetector::findHandsContours(Mat img) {
     for (const auto &contour : contours) {
         Hand h(contour, shouldCheckSize, shouldCheckAngles);
         h.getBr();
-        for (Hand hnd : hands) {
-            if (contourArea(h.contour) < contourArea(hnd.contour) &&
-                (h.border.x > hnd.border.x && h.border.x < hnd.border.x + hnd.border.width) &&
-                (h.border.y > hnd.border.y && h.border.y < hnd.border.y + hnd.border.height)) {
-                h.area = -1;
-                break;
-            }
-        }
-        if (h.area != -1) {
-            if (h.checkSize())
+        if (h.checkSize())
                 hands.push_back(h);
-        }
     }
 }
 

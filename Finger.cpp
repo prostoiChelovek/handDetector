@@ -30,9 +30,7 @@ bool Finger::checkAngles() {
 }
 
 bool Finger::check() {
-    checkDepth();
-    if (shouldCheckAngles)
-        checkAngles();
+    ok = checkDepth() && checkAngles();
     return ok;
 }
 

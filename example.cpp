@@ -5,18 +5,15 @@
 using namespace std;
 using namespace cv;
 
-#define Q_KEY 1048689
-#define B_KEY 1048674
-
 int main()
 {
     HandDetector hd;
-    VideoCapture cap(0);
+    VideoCapture cap(1);
 
-    Mat frame, img, blur, bg, imgHSV, mask;
+    Mat frame, img, blur, bg, imgYCrCb, mask;
 
-    Scalar lower = Scalar(91, 0, 0);
-    Scalar upper = Scalar(255, 255, 255);
+    Scalar lower = Scalar(0, 135, 90);
+    Scalar upper = Scalar(255, 230, 150);
 
     cap >> bg;
 
@@ -26,8 +23,8 @@ int main()
         flip(frame, frame, 1);
 
         hd.deleteBg(frame, bg, img);
-        cvtColor(img, imgHSV, COLOR_BGR2HSV);
-        mask = hd.detectHands_range(imgHSV, lower, upper);
+        cvtColor(img, imgYCrCb, COLOR_BGR2YCrCb);
+        mask = hd.detectHands_range(imgYCrCb, lower, upper);
         hd.getFingers();
         hd.getCenters();
         hd.getHigherFingers();
@@ -38,20 +35,21 @@ int main()
         imshow("hands", frame);
         imshow("mask", mask);
 
-        int key = waitKeyEx(1);
-        switch (key) {
-            case Q_KEY: // exit
-                return EXIT_SUCCESS;
-            case B_KEY: // change bg
-                cap >> bg;
-                flip(bg, bg, 0);
-                flip(bg, bg, 1);
-                cout << "Background changed." << endl;
-                break;
-            default:
-                if (key != -1)
-                    printf("Key presed: %i\n", key);
-                break;
+        char key = waitKeyEx(1);
+        if (key != -1) {
+            switch (key) {
+                case 'q': // exit
+                    return EXIT_SUCCESS;
+                case 'b': // change bg
+                    cap >> bg;
+                    flip(bg, bg, 0);
+                    flip(bg, bg, 1);
+                    cout << "Background changed." << endl;
+                    break;
+                default:
+                    printf("Key presed: %c\n", key);
+                    break;
+            }
         }
     }
     return EXIT_SUCCESS;
