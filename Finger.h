@@ -15,7 +15,8 @@ using namespace std;
 
 class Finger {
 public:
-    Point ptStart, ptEnd, ptFar;
+    Point ptStart; // fingertip
+    Point ptEnd, ptFar;
 
     double angle, inAngle, length;
     float depth;

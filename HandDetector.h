@@ -14,20 +14,16 @@ public:
     vector<Hand> hands;
     vector<vector<Point>> contours;
 
-    // detectHands_range
-    int range_thresh_sens_val = 100;
-    bool blur_range = true;
-    Size range_blur_ksize = Size(10, 10);
-
-    int bgs_thresh_sens_val = 20;
+    int thresh_sens_val = 20;
+    Size blurKsize = Size(10, 10);
 
     // detectHands_Cascade
     String cascadePath;
     CascadeClassifier cascade;
     bool cascadeLoaded = false;
-    int cascade_thresh_sens_val = 20;
 
-    bool shouldCheckSize = true;
+    bool shouldBlur = true;
+    bool shouldCheckSize = false;
     bool shouldCheckAngles = true;
 
     HandDetector();

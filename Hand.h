@@ -17,22 +17,34 @@ public:
     vector<Vec4i> defects;
     Rect border;
     vector<Finger> fingers;
+
     Moments moment;
     Point center = Point(-1, -1);
+
     double area;
     Size areaLimits = Size(50 * 50, 800 * 800);
+
+    // set to -1 to not check
+    int maxFingers = 5;
+    int maxAspectRatio = 4;
+
+    int minFTDist = 10; // min distance between fingertips
+
     Finger higherFinger;
     Finger farthestFinger;
+
     bool ok = false;
+
     bool shouldCheckSize = true;
     bool shouldCheckAngles = true;
+    bool shouldCheckDists = true; // check distance between fingertips
 
     explicit Hand(vector<Point> contour_, bool shouldCheckSize_ = true,
-                  bool shouldCheckAngles_ = true);
+                  bool shouldCheckAngles_ = true, bool shouldCheckDists_ = true);
 
     bool checkSize();
 
-    void getBr();
+    void removeCloseFingertips(); // remove fingertips that are too close to  each other
 
     void getCenter();
 

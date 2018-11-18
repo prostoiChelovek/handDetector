@@ -14,12 +14,13 @@ bool HandDetector::loadCascade(String path) {
 }
 
 void HandDetector::findHandsContours(Mat img) {
-    hands.clear();
-    vector<Vec4i> hierarchy;
-    findContours(img, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
-    for (const auto &contour : contours) {
+    Mat edges;
+
+    threshold(img, img, thresh_sens_val, 255, THRESH_BINARY);
+
+    findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+    for (auto &contour : contours) {
         Hand h(contour, shouldCheckSize, shouldCheckAngles);
-        h.getBr();
         if (h.checkSize())
                 hands.push_back(h);
     }
@@ -31,7 +32,7 @@ Mat HandDetector::deleteBg(Mat img, Mat bg, Mat &out) {
 
     Mat grayscale, threshDiff;
     cvtColor(deltaImg, grayscale, CV_BGR2GRAY);
-    threshold(grayscale, threshDiff, bgs_thresh_sens_val, 255, THRESH_BINARY);
+    threshold(grayscale, threshDiff, thresh_sens_val, 255, THRESH_BINARY);
     mask_morph(threshDiff);
 
     Mat res;
@@ -41,14 +42,13 @@ Mat HandDetector::deleteBg(Mat img, Mat bg, Mat &out) {
 }
 
 Mat HandDetector::detectHands_range(Mat img, Scalar lower, Scalar upper) {
+    hands.clear();
     Mat mask;
     inRange(img, lower, upper, mask);
-    threshold(mask, mask, range_thresh_sens_val, 255, THRESH_BINARY);
+    threshold(mask, mask, thresh_sens_val, 255, THRESH_BINARY);
     mask_morph(mask);
-    if (blur_range) {
-        blur(mask, mask, range_blur_ksize);
-        threshold(mask, mask, range_thresh_sens_val, 255, THRESH_BINARY);
-    }
+    if (shouldBlur)
+        blur(mask, mask, blurKsize);
     findHandsContours(mask);
     return mask;
 }
@@ -56,15 +56,13 @@ Mat HandDetector::detectHands_range(Mat img, Scalar lower, Scalar upper) {
 void HandDetector::detectHands_Cascade(Mat img) {
     if (!cascadeLoaded)
         return;
+    hands.clear();
     cvtColor(img, img, COLOR_BGR2GRAY);
     vector<Rect> rects;
     cascade.detectMultiScale(img, rects, 1.1,
                              2, 0 | CASCADE_SCALE_IMAGE);
     for (Rect &r : rects) {
-        Mat i = img(r);
-        Mat thresh;
-        threshold(i, thresh, cascade_thresh_sens_val, 255, THRESH_BINARY);
-        findHandsContours(thresh);
+        findHandsContours(img(r));
     }
 }
 

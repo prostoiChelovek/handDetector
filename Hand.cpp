@@ -3,24 +3,36 @@
 using namespace cv;
 using namespace std;
 
-Hand::Hand(vector<Point> contour_, bool shouldCheckSize_, bool shouldCheckAngles_) {
+Hand::Hand(vector<Point> contour_, bool shouldCheckSize_, bool shouldCheckAngles_,
+           bool shouldCheckDists_) {
     contour = move(contour_);
     moment = moments((Mat) contour);
     area = moment.m00;
+    border = boundingRect(contour);
     shouldCheckSize = shouldCheckSize_;
     shouldCheckAngles = shouldCheckAngles_;
+    shouldCheckDists = shouldCheckDists_;
 }
 
 bool Hand::checkSize() {
-    if (shouldCheckSize)
-        ok = (area > areaLimits.width && area < areaLimits.height);
-    else
+    if (shouldCheckSize) {
+        ok = (area > areaLimits.width && area < areaLimits.height) &&
+             (maxAspectRatio != -1 && border.height / border.width <= maxAspectRatio &&
+              border.width / border.height <= maxAspectRatio);
+    } else
         ok = true;
     return ok;
 }
 
-void Hand::getBr() {
-    border = boundingRect(contour);
+void Hand::removeCloseFingertips() {
+    if (shouldCheckDists) {
+        for (int i = 0; i < fingers.size(); i++) {
+            for (int j = 0; j < fingers.size(); j++) {
+                if (i != j && getDist(fingers[i].ptStart, fingers[j].ptStart) <= minFTDist)
+                    fingers.erase(fingers.begin() + i);
+            }
+        }
+    }
 }
 
 void Hand::getCenter() {
@@ -37,6 +49,8 @@ void Hand::getFingers() {
             if (f.ok)
                 fingers.push_back(f);
         }
+        if (maxFingers != -1 && fingers.size() > maxFingers)
+            ok = false;
     } else
         ok = false;
 }
@@ -77,7 +91,6 @@ void Hand::drawFingers(Mat &img, Scalar color, int thickness) {
 
 void Hand::draw(Mat &img, Scalar color, int thickness) {
     drawFingers(img, color, thickness);
-    getBr();
     rectangle(img, border, color, thickness);
     if (center.x != -1)
         circle(img, center, 5, color, thickness);
