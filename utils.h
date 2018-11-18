@@ -6,7 +6,7 @@
 
 using namespace cv;
 
-float innerAngle(float px1, float py1, float px2, float py2, float cx1, float cy1);
+float getAngle(Point s, Point f, Point e);
 
 double getDist(Point a, Point b);
 

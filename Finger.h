@@ -18,31 +18,30 @@ public:
     Point ptStart; // fingertip
     Point ptEnd, ptFar;
 
-    double angle, inAngle, length;
     float depth;
-    bool shouldCheckAngles = true;
 
+    float maxAngle = 95;
     int minDepth = 11;
+
     bool ok = false;
 
-    // hand`s
-    Rect boundingBox;
+    bool shouldCheckAngles = true;
+    bool shouldCheckDist = false; // check distance between ptStart, ptFar and ptEnd;
+
+    Rect boundingBox; // hand`s
 
     Finger();
 
     Finger(const Vec4i &v, const vector<Point> &cnt, const Rect &boundingBox_,
-           bool shouldCheckAngles_ = true);
+           bool shouldCheckAngles_ = true, bool shouldCheckDist_ = true);
 
     bool checkDepth();
-
     bool checkAngles();
 
+    bool checkDists(); // check distance between ptStart, ptFar and ptEnd;
     bool check();
 
     void getPoints(vector<Point> cnt, Vec4i v);
-
-    // For use it, firstly call getPoints()
-    void countAngles();
 
     void draw(Mat &img, Scalar color = Scalar(255, 0, 100), int thickness = 2,
               Scalar fingertipColor = Scalar(0, 0, 0));
