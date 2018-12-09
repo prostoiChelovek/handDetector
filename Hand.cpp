@@ -6,7 +6,7 @@ using namespace std;
 Hand::Hand(vector<Point> contour_, bool shouldCheckSize_, bool shouldCheckAngles_,
            bool shouldCheckDists_) {
     contour = move(contour_);
-    moment = moments((Mat) contour);
+    moment = moments(contour);
     area = moment.m00;
     border = boundingRect(contour);
     shouldCheckSize = shouldCheckSize_;
@@ -25,12 +25,12 @@ bool Hand::checkSize() {
 }
 
 void Hand::removeCloseFingertips() {
-    if (shouldCheckDists) {
-        for (int i = 0; i < fingers.size(); i++) {
-            for (int j = 0; j < fingers.size(); j++) {
-                if (i != j && getDist(fingers[i].ptStart, fingers[j].ptStart) <= minFTDist)
-                    fingers.erase(fingers.begin() + i);
-            }
+    if (!shouldCheckDists)
+        return;
+    for (int i = 0; i < fingers.size(); i++) {
+        for (int j = 0; j < fingers.size(); j++) {
+            if (i != j && getDist(fingers[i].ptStart, fingers[j].ptStart) <= minFTDist)
+                fingers.erase(fingers.begin() + i);
         }
     }
 }
@@ -40,18 +40,21 @@ void Hand::getCenter() {
 }
 
 void Hand::getFingers() {
-    if (!contour.empty()) {
-        convexHull(contour, hull, false);
-        convexHull(contour, hullI, false);
-        convexityDefects(contour, hullI, defects);
-        for (const Vec4i &v : defects) {
-            Finger f = Finger(v, contour, border, shouldCheckAngles);
-            if (f.ok)
-                fingers.push_back(f);
-        }
-        if (maxFingers != -1 && fingers.size() > maxFingers)
-            ok = false;
-    } else
+    if (contour.empty()) {
+        ok = false;
+        return;
+    }
+    convexHull(contour, hull, false);
+    convexHull(contour, hullI, false);
+    convexityDefects(contour, hullI, defects);
+
+    for (const Vec4i &v : defects) {
+        Finger f = Finger(v, contour, border, shouldCheckAngles);
+        if (f.ok)
+            fingers.push_back(f);
+    }
+    removeCloseFingertips();
+    if (maxFingers != -1 && fingers.size() > maxFingers)
         ok = false;
 }
 

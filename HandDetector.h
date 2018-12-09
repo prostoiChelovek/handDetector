@@ -23,7 +23,7 @@ public:
     bool cascadeLoaded = false;
 
     bool shouldBlur = true;
-    bool shouldCheckSize = false;
+    bool shouldCheckSize = true;
     bool shouldCheckAngles = true;
 
     HandDetector();
@@ -35,7 +35,6 @@ public:
     Mat deleteBg(Mat img, Mat bg, Mat &out);
 
     Mat detectHands_range(Mat img, Scalar lower, Scalar upper);
-
     void detectHands_Cascade(Mat img);
 
     void getFingers();

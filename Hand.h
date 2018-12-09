@@ -44,7 +44,7 @@ public:
 
     bool checkSize();
 
-    void removeCloseFingertips(); // remove fingertips that are too close to  each other
+    void removeCloseFingertips(); // remove fingertips that are too close to each other
 
     void getCenter();
 

@@ -2,15 +2,15 @@
 
 Finger::Finger() = default;
 
-Finger::Finger(const Vec4i &v, const vector<Point> &cnt, const Rect &boundingBox_,
+Finger::Finger(const Vec4i &defect, const vector<Point> &cnt, const Rect &boundingBox_,
                bool shouldCheckAngles_, bool shouldCheckDist_) {
     boundingBox = boundingBox_;
-    depth = v[3] / 256;
+    depth = defect[3] / 256;
 
     shouldCheckAngles = shouldCheckAngles_;
     shouldCheckDist = shouldCheckDist_;
 
-    getPoints(cnt, v);
+    getPoints(cnt, defect);
 
     check();
 }
@@ -32,7 +32,7 @@ bool Finger::checkDists() {
     if (!shouldCheckDist)
         return true;
 
-    static int minDist = boundingBox.height / 5;
+    int minDist = boundingBox.height / 5;
 
     ok = (getDist(ptStart, ptFar) > minDist && getDist(ptEnd, ptFar) > minDist);
     return ok;

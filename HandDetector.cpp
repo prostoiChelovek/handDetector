@@ -14,10 +14,7 @@ bool HandDetector::loadCascade(String path) {
 }
 
 void HandDetector::findHandsContours(Mat img) {
-    Mat edges;
-
     threshold(img, img, thresh_sens_val, 255, THRESH_BINARY);
-
     findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
     for (auto &contour : contours) {
         Hand h(contour, shouldCheckSize, shouldCheckAngles);

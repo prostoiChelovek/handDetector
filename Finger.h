@@ -1,7 +1,3 @@
-//
-// Created by mr_blaze on 18.10.18.
-//
-
 #ifndef HANDDETECTOR_FINGER_H
 #define HANDDETECTOR_FINGER_H
 
@@ -26,13 +22,13 @@ public:
     bool ok = false;
 
     bool shouldCheckAngles = true;
-    bool shouldCheckDist = false; // check distance between ptStart, ptFar and ptEnd;
+    bool shouldCheckDist = true; // check distance between ptStart, ptFar and ptEnd;
 
     Rect boundingBox; // hand`s
 
     Finger();
 
-    Finger(const Vec4i &v, const vector<Point> &cnt, const Rect &boundingBox_,
+    Finger(const Vec4i &defect, const vector<Point> &cnt, const Rect &boundingBox_,
            bool shouldCheckAngles_ = true, bool shouldCheckDist_ = true);
 
     bool checkDepth();

@@ -39,6 +39,7 @@ int main()
         if (key != -1) {
             switch (key) {
                 case 'q': // exit
+                    cout << "exit" << endl;
                     return EXIT_SUCCESS;
                 case 'b': // change bg
                     cap >> bg;
