@@ -7,11 +7,11 @@ find_package(OpenCV REQUIRED)
 
 set(SOURCE_FILES
         example.cpp
-        Finger.cpp Finger.h utils.cpp utils.h Hand.cpp Hand.h HandDetector.cpp HandDetector.h)
+        Finger.cpp Finger.h utils.cpp utils.h Hand.cpp Hand.h HandDetector.cpp HandDetector.h Filter.cpp Filter.h)
 
-set(headers Finger.h utils.h Hand.h HandDetector.h)
+set(headers Finger.h utils.h Hand.h HandDetector.h Filter.h)
 
-set(LIBHANDD_SRC Finger.cpp utils.cpp Hand.cpp HandDetector.cpp)
+set(LIBHANDD_SRC Finger.cpp utils.cpp Hand.cpp HandDetector.cpp Filter.cpp)
 
 add_library(handDetector_dynamic SHARED ${LIBHANDD_SRC})
 add_library(handDetector_static STATIC ${LIBHANDD_SRC})
@@ -34,4 +34,4 @@ install(FILES ${headers} DESTINATION include/handDetector)
 
 add_executable(handDetector ${SOURCE_FILES})
 target_link_libraries(handDetector ${OpenCV_LIBS})
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-sign-compare")

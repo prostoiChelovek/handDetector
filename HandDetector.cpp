@@ -3,7 +3,15 @@
 using namespace cv;
 using namespace std;
 
-HandDetector::HandDetector() = default;
+void HandDetector::findHandsContours(Mat img) {
+    threshold(img, img, thresh_sens_val, 255, THRESH_BINARY);
+    findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+    for (auto &contour : contours) {
+        Hand h(contour, shouldCheckSize, shouldCheckAngles);
+        if (h.checkSize())
+            hands.push_back(h);
+    }
+}
 
 bool HandDetector::loadCascade(String path) {
     if (cascadePath.empty())
@@ -11,16 +19,6 @@ bool HandDetector::loadCascade(String path) {
     cascade.load(cascadePath);
     cascadeLoaded = !cascade.empty();
     return !cascade.empty();
-}
-
-void HandDetector::findHandsContours(Mat img) {
-    threshold(img, img, thresh_sens_val, 255, THRESH_BINARY);
-    findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
-    for (auto &contour : contours) {
-        Hand h(contour, shouldCheckSize, shouldCheckAngles);
-        if (h.checkSize())
-                hands.push_back(h);
-    }
 }
 
 Mat HandDetector::deleteBg(Mat img, Mat bg, Mat &out) {
@@ -66,8 +64,10 @@ void HandDetector::detectHands_Cascade(Mat img) {
 void HandDetector::getFingers() {
     for (Hand &h : hands) {
         h.getFingers();
-        checkHands();
+        ShortHand shH = h.getSame(lastHands);
+        h.getFingersIndexes(shH.fingers);
     }
+    checkHands();
 }
 
 void HandDetector::getHigherFingers() {
@@ -94,6 +94,55 @@ void HandDetector::checkHands() {
 void HandDetector::getCenters() {
     for (Hand &h : hands) {
         h.getCenter();
+    }
+}
+
+void HandDetector::initFilters() {
+    for (Hand &h : hands) {
+        ShortHand shH = h.getSame(lastHands);
+        if (shH.filtersIndex == -1 && h.filtersIndex == -1) {
+            filters.emplace_back(vector<Filter>{});
+            h.filtersIndex = filters.size() - 1;
+            vector<Filter> &fltr = filters[filters.size() - 1];
+            for (int i = 0; i < h.maxFingers; i++) {
+                fltr.emplace_back(8, 6, processNoiseCov, measurementNoiseCov, errorCovPost);
+            }
+        } else if (shH.filtersIndex != -1) {
+            h.filtersIndex = shH.filtersIndex;
+        }
+    }
+}
+
+void HandDetector::updateFilters() {
+    for (Hand &h : hands) {
+        if (h.filtersIndex >= filters.size())
+            continue;
+        h.updateFilters(filters[h.filtersIndex]);
+    }
+}
+
+void HandDetector::stabilize() {
+    for (Hand &h : hands) {
+        if (h.filtersIndex >= filters.size())
+            continue;
+        h.stabilizeFingers(filters[h.filtersIndex]);
+    }
+}
+
+void HandDetector::updateLast() {
+    lastHands.clear();
+    for (const Hand &h : hands) {
+        ShortHand shH = {h.border, h.filtersIndex};
+        for (const Finger &f : h.fingers) {
+            ShortFinger shF = {
+                    f.ptStart,
+                    f.ptEnd,
+                    f.ptFar,
+                    f.index
+            };
+            shH.fingers.emplace_back(shF);
+        }
+        lastHands.emplace_back(shH);
     }
 }
 

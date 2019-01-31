@@ -1,7 +1,35 @@
+#include <algorithm>
 #include "Hand.h"
 
 using namespace cv;
 using namespace std;
+
+ShortHand::ShortHand() {
+    filtersIndex = -1;
+}
+
+ShortHand::ShortHand(const Rect &border) : border(border) {
+    filtersIndex = -1;
+}
+
+ShortHand::ShortHand(const Rect &border, int filtersIndex) : border(border), filtersIndex(filtersIndex) {}
+
+bool ShortHand::operator==(const ShortHand &b) {
+    if (filtersIndex != b.filtersIndex)
+        return false;
+    if (border != b.border)
+        return false;
+    if (fingers.size() != b.fingers.size())
+        return false;
+    for (const ShortFinger &f : fingers) {
+        for (const ShortFinger &bF : b.fingers) {
+            if (f != bF)
+                return false;
+        }
+    }
+    return true;
+}
+
 
 Hand::Hand(vector<Point> contour_, bool shouldCheckSize_, bool shouldCheckAngles_,
            bool shouldCheckDists_) {
@@ -49,18 +77,19 @@ void Hand::getFingers() {
     convexityDefects(contour, hullI, defects);
 
     for (const Vec4i &v : defects) {
-        Finger f = Finger(v, contour, border, shouldCheckAngles);
+        Finger f(v, contour, border, shouldCheckAngles);
         if (f.ok)
             fingers.push_back(f);
     }
     removeCloseFingertips();
-    if (maxFingers != -1 && fingers.size() > maxFingers)
-        ok = false;
+    if (maxFingers != -1 && fingers.size() > maxFingers) {
+        fingers.erase(fingers.begin() + maxFingers - 1);
+    }
 }
 
 void Hand::getHigherFinger() {
-    Point higher(fingers[0].ptStart.x, fingers[0].ptStart.y);
-    Finger hf = fingers[0];
+    Point higher(-1, -1);
+    Finger hf;
     for (Finger &f : fingers) {
         if (f.ptStart.y < higher.y) {
             higher = f.ptStart;
@@ -73,7 +102,7 @@ void Hand::getHigherFinger() {
 void Hand::getFarthestFinger() {
     double farthest = -1;
     double dist;
-    Finger ff = fingers[0];
+    Finger ff;
     for (Finger &f : fingers) {
         dist = getDist(f.ptFar, f.ptEnd);
         if (dist > farthest) {
@@ -82,6 +111,65 @@ void Hand::getFarthestFinger() {
         }
     }
     farthestFinger = ff;
+}
+
+ShortHand Hand::getSame(const vector<ShortHand> &hands) {
+    int minDiff = NULL;
+    ShortHand res;
+    for (const ShortHand &h : hands) {
+        int diff = 0;
+        diff += getDist(Point(h.border.x, h.border.y),
+                        Point(border.x, border.y));
+        diff += abs(h.border.width - border.width);
+        diff += abs(h.border.height - border.height);
+        if (minDiff == NULL || diff < minDiff) {
+            minDiff = diff;
+            res = h;
+        }
+    }
+    return res;
+}
+
+void Hand::getFingersIndexes(const vector<ShortFinger> &lastFingers_) {
+    int i = 0;
+    vector<ShortFinger> lastFingers = lastFingers_;
+    vector<int> indexes;
+    for (Finger &f : fingers) {
+        ShortFinger shF = f.getSame(lastFingers);
+        if (shF.index == -1) {
+            f.index = i;
+        } else {
+            f.index = shF.index;
+        }
+        if (find(indexes.begin(), indexes.end(), f.index) != indexes.end()) {
+            sort(indexes.begin(), indexes.end());
+            for (int j = 0; j < maxFingers; j++) {
+                if (find(indexes.begin(), indexes.end(), j) == indexes.end()) {
+                    f.index = j;
+                    break;
+                }
+            }
+        }
+        indexes.emplace_back(f.index);
+        lastFingers.erase(remove(lastFingers.begin(), lastFingers.end(), shF), lastFingers.end());
+        i++;
+    }
+}
+
+void Hand::updateFilters(vector<Filter> &filters) {
+    for (Finger &f : fingers) {
+        if (f.index >= filters.size())
+            continue;
+        f.updateFilter(filters[f.index]);
+    }
+}
+
+void Hand::stabilizeFingers(vector<Filter> &filters) {
+    for (Finger &f : fingers) {
+        if (f.index >= filters.size())
+            continue;
+        f.stabilize(filters[f.index]);
+    }
 }
 
 void Hand::drawFingers(Mat &img, Scalar color, int thickness) {
@@ -96,5 +184,5 @@ void Hand::draw(Mat &img, Scalar color, int thickness) {
     drawFingers(img, color, thickness);
     rectangle(img, border, color, thickness);
     if (center.x != -1)
-        circle(img, center, 5, color, thickness);
+        circle(img, center, 3, color, CV_FILLED);
 }

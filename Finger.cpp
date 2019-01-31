@@ -1,14 +1,35 @@
 #include "Finger.h"
 
+ShortFinger::ShortFinger() {
+    index = -1;
+}
+
+ShortFinger::ShortFinger(const Point &ptStart, Point ptEnd, Point ptFar, int index)
+        : ptStart(ptStart), ptEnd(ptEnd), ptFar(ptFar), index(index) {}
+
+bool ShortFinger::operator==(const ShortFinger &b) const {
+    return index == b.index &&
+           ptStart == b.ptStart &&
+           ptFar == b.ptFar &&
+           ptEnd == b.ptEnd;
+}
+
+bool ShortFinger::operator!=(const ShortFinger &b) const {
+    return !(operator==(b));
+}
+
+
 Finger::Finger() = default;
 
 Finger::Finger(const Vec4i &defect, const vector<Point> &cnt, const Rect &boundingBox_,
-               bool shouldCheckAngles_, bool shouldCheckDist_) {
+               bool shouldCheckAngles_, bool shouldCheckDist_, int index_) {
     boundingBox = boundingBox_;
     depth = defect[3] / 256;
 
     shouldCheckAngles = shouldCheckAngles_;
     shouldCheckDist = shouldCheckDist_;
+
+    index = index_;
 
     getPoints(cnt, defect);
 
@@ -50,6 +71,39 @@ void Finger::getPoints(vector<Point> cnt, Vec4i v) {
     ptEnd = Point(cnt[endidx]);
     int faridx = v[2];
     ptFar = Point(cnt[faridx]);
+}
+
+ShortFinger Finger::getSame(const vector<ShortFinger> &fingers) {
+    int minDist = NULL;
+    ShortFinger res;
+    for (const ShortFinger &fn : fingers) {
+        int crDist = getDist(fn.ptStart, ptStart) +
+                     getDist(fn.ptEnd, ptEnd) +
+                     getDist(fn.ptFar, ptFar);
+        if (minDist == NULL || crDist < minDist) {
+            minDist = crDist;
+            res = fn;
+        }
+    }
+    return res;
+}
+
+void Finger::updateFilter(Filter &f) {
+    f.update(vector<float>{
+            ptStart.x, ptStart.y,
+            ptEnd.x, ptEnd.y,
+            ptFar.x, ptFar.y,
+    });
+}
+
+void Finger::stabilize(Filter &f) {
+    vector<float> prd = f.predict();
+    ptStart.x = prd[0];
+    ptStart.y = prd[1];
+    ptEnd.x = prd[2];
+    ptEnd.y = prd[3];
+    ptFar.x = prd[4];
+    ptFar.y = prd[5];
 }
 
 void Finger::draw(Mat &img, Scalar color, int thickness, Scalar fingertipColor) {

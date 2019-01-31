@@ -3,11 +3,28 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <algorithm>
 
 #include "Finger.h"
+#include "Filter.h"
 
 using namespace cv;
 using namespace std;
+
+struct ShortHand {
+    ShortHand();
+
+    explicit ShortHand(const Rect &border);
+
+    ShortHand(const Rect &border, int filtersIndex);
+
+    bool operator==(const ShortHand &b);
+
+    Rect border;
+    int filtersIndex;
+    vector<ShortFinger> fingers;
+};
+
 
 class Hand {
 public:
@@ -39,6 +56,9 @@ public:
     bool shouldCheckAngles = true;
     bool shouldCheckDists = true; // check distance between fingertips
 
+    // index of filters in handDetector`s vector
+    int filtersIndex = -1;
+
     explicit Hand(vector<Point> contour_, bool shouldCheckSize_ = true,
                   bool shouldCheckAngles_ = true, bool shouldCheckDists_ = true);
 
@@ -51,11 +71,17 @@ public:
     void getFingers();
 
     void getHigherFinger();
-
     void getFarthestFinger();
 
-    void drawFingers(Mat &img, Scalar color = Scalar(255, 0, 100), int thickness = 2);
+    ShortHand getSame(const vector<ShortHand> &hands);
 
+    void getFingersIndexes(const vector<ShortFinger> &lastFingers_);
+
+    void updateFilters(vector<Filter> &filters);
+
+    void stabilizeFingers(vector<Filter> &filters);
+
+    void drawFingers(Mat &img, Scalar color = Scalar(255, 0, 100), int thickness = 2);
     void draw(Mat &img, Scalar color = Scalar(255, 0, 100), int thickness = 2);
 };
 

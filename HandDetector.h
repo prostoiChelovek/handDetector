@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Hand.h"
+#include "Filter.h"
 
 using namespace cv;
 using namespace std;
@@ -22,15 +23,21 @@ public:
     CascadeClassifier cascade;
     bool cascadeLoaded = false;
 
+    // Filter
+    Scalar processNoiseCov = Scalar::all(1e-1);
+    Scalar measurementNoiseCov = Scalar::all(1e-1);
+    Scalar errorCovPost = Scalar::all(.3);
+    vector<vector<Filter>> filters;
+
     bool shouldBlur = true;
     bool shouldCheckSize = true;
     bool shouldCheckAngles = true;
 
-    HandDetector();
-
-    bool loadCascade(String path);
+    HandDetector() = default;
 
     void findHandsContours(Mat img);
+
+    bool loadCascade(String path);
 
     Mat deleteBg(Mat img, Mat bg, Mat &out);
 
@@ -46,7 +53,18 @@ public:
 
     void checkHands();
 
+    void initFilters();
+
+    void updateFilters();
+
+    void stabilize();
+
+    void updateLast();
+
     void drawHands(Mat &img, Scalar color = Scalar(255, 0, 100), int thickness = 2);
+
+private:
+    vector<ShortHand> lastHands;
 };
 
 

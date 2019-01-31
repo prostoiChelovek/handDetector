@@ -8,7 +8,7 @@ using namespace cv;
 int main()
 {
     HandDetector hd;
-    VideoCapture cap(1);
+    VideoCapture cap(0);
 
     Mat frame, img, blur, bg, imgYCrCb, mask;
 
@@ -26,6 +26,11 @@ int main()
         cvtColor(img, imgYCrCb, COLOR_BGR2YCrCb);
         mask = hd.detectHands_range(imgYCrCb, lower, upper);
         hd.getFingers();
+
+        hd.initFilters();
+        hd.updateFilters();
+        hd.stabilize();
+
         hd.getCenters();
         hd.getHigherFingers();
         hd.getFarthestFingers();
@@ -34,6 +39,8 @@ int main()
 
         imshow("hands", frame);
         imshow("mask", mask);
+
+        hd.updateLast();
 
         char key = waitKeyEx(1);
         if (key != -1) {
