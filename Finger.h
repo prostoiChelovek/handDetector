@@ -59,7 +59,6 @@ public:
     ShortFinger getSame(const vector<ShortFinger> &fingers);
 
     void updateFilter(Filter &f);
-
     void stabilize(Filter &f);
 
     void draw(Mat &img, Scalar color = Scalar(255, 0, 100), int thickness = 2,

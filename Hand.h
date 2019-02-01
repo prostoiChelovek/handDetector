@@ -73,12 +73,10 @@ public:
     void getHigherFinger();
     void getFarthestFinger();
 
-    ShortHand getSame(const vector<ShortHand> &hands);
+    ShortHand getSame(const vector<ShortHand> &hands) const;
 
     void getFingersIndexes(const vector<ShortFinger> &lastFingers_);
-
     void updateFilters(vector<Filter> &filters);
-
     void stabilizeFingers(vector<Filter> &filters);
 
     void drawFingers(Mat &img, Scalar color = Scalar(255, 0, 100), int thickness = 2);

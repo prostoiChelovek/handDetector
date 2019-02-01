@@ -9,6 +9,10 @@ int main()
 {
     HandDetector hd;
     VideoCapture cap(0);
+    if (!cap.isOpened()) {
+        cerr << "Cannot open video capture" << endl;
+        return EXIT_FAILURE;
+    }
 
     Mat frame, img, blur, bg, imgYCrCb, mask;
 

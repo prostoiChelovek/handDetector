@@ -113,7 +113,7 @@ void Hand::getFarthestFinger() {
     farthestFinger = ff;
 }
 
-ShortHand Hand::getSame(const vector<ShortHand> &hands) {
+ShortHand Hand::getSame(const vector<ShortHand> &hands) const {
     int minDiff = NULL;
     ShortHand res;
     for (const ShortHand &h : hands) {
@@ -122,6 +122,7 @@ ShortHand Hand::getSame(const vector<ShortHand> &hands) {
                         Point(border.x, border.y));
         diff += abs(h.border.width - border.width);
         diff += abs(h.border.height - border.height);
+        diff += (filtersIndex == h.filtersIndex ? -25 : 25);
         if (minDiff == NULL || diff < minDiff) {
             minDiff = diff;
             res = h;

@@ -5,6 +5,10 @@ using namespace std;
 
 void HandDetector::findHandsContours(Mat img) {
     threshold(img, img, thresh_sens_val, 255, THRESH_BINARY);
+    mask_morph(img);
+    if (shouldBlur)
+        blur(img, img, blurKsize);
+    threshold(img, img, thresh_sens_val, 255, THRESH_BINARY);
     findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
     for (auto &contour : contours) {
         Hand h(contour, shouldCheckSize, shouldCheckAngles);
@@ -40,10 +44,6 @@ Mat HandDetector::detectHands_range(Mat img, Scalar lower, Scalar upper) {
     hands.clear();
     Mat mask;
     inRange(img, lower, upper, mask);
-    threshold(mask, mask, thresh_sens_val, 255, THRESH_BINARY);
-    mask_morph(mask);
-    if (shouldBlur)
-        blur(mask, mask, blurKsize);
     findHandsContours(mask);
     return mask;
 }
@@ -98,18 +98,27 @@ void HandDetector::getCenters() {
 }
 
 void HandDetector::initFilters() {
+    vector<ShortHand> lastHands_ = lastHands;
+    vector<int> indexes;
     for (Hand &h : hands) {
-        ShortHand shH = h.getSame(lastHands);
+        ShortHand shH = h.getSame(lastHands_);
         if (shH.filtersIndex == -1 && h.filtersIndex == -1) {
             filters.emplace_back(vector<Filter>{});
             h.filtersIndex = filters.size() - 1;
-            vector<Filter> &fltr = filters[filters.size() - 1];
+            vector<Filter> &fltr = filters[h.filtersIndex];
             for (int i = 0; i < h.maxFingers; i++) {
                 fltr.emplace_back(8, 6, processNoiseCov, measurementNoiseCov, errorCovPost);
             }
         } else if (shH.filtersIndex != -1) {
             h.filtersIndex = shH.filtersIndex;
         }
+        lastHands_.erase(remove(lastHands_.begin(), lastHands_.end(), shH), lastHands_.end());
+        if (find(indexes.begin(), indexes.end(), h.filtersIndex) != indexes.end()) {
+            sort(indexes.begin(), indexes.end());
+            h.filtersIndex = -1;
+        }
+        if (h.filtersIndex != -1)
+            indexes.emplace_back(h.filtersIndex);
     }
 }
 
@@ -131,6 +140,7 @@ void HandDetector::stabilize() {
 
 void HandDetector::updateLast() {
     lastHands.clear();
+    vector<ShortHand> lastHands_ = lastHands;
     for (const Hand &h : hands) {
         ShortHand shH = {h.border, h.filtersIndex};
         for (const Finger &f : h.fingers) {
@@ -142,7 +152,13 @@ void HandDetector::updateLast() {
             };
             shH.fingers.emplace_back(shF);
         }
-        lastHands.emplace_back(shH);
+        ShortHand same = h.getSame(lastHands_);
+        auto el = find(lastHands.begin(), lastHands.end(), same);
+        if (el != lastHands.end()) {
+            *el = same;
+            lastHands_.erase(remove(lastHands_.begin(), lastHands_.end(), same), lastHands_.end());
+        } else
+            lastHands.emplace_back(shH);
     }
 }
 
