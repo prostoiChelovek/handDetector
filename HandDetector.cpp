@@ -163,13 +163,22 @@ void HandDetector::updateLast() {
     for (ShortHand h : lastHands_) {
         auto el = find(lastHands.begin(), lastHands.end(), h);
         ShortHand &vH = *el;
-        if (vH.border.x == 0 && vH.border.y == 0)
-            lastHands.erase(el);
         if (h.nfFrames < maxNFFrames) {
             vH.nfFrames++;
             *el = vH;
-        } else
+        } else {
             lastHands.erase(el);
+            if (vH.filtersIndex != -1) {
+                filters.erase(filters.begin() + vH.filtersIndex);
+                for (int i = vH.filtersIndex; i < filters.size(); i++) {
+                    auto elInd = find_if(lastHands.begin(), lastHands.end(),
+                                         [&i](const ShortHand &obj) { return obj.filtersIndex == i; });
+                    ShortHand &fndEl = *elInd;
+                    fndEl.filtersIndex--;
+                    *elInd = fndEl;
+                }
+            }
+        }
     }
 }
 
