@@ -139,7 +139,6 @@ void HandDetector::stabilize() {
 }
 
 void HandDetector::updateLast() {
-    lastHands.clear();
     vector<ShortHand> lastHands_ = lastHands;
     for (const Hand &h : hands) {
         ShortHand shH = {h.border, h.filtersIndex};
@@ -159,6 +158,18 @@ void HandDetector::updateLast() {
             lastHands_.erase(remove(lastHands_.begin(), lastHands_.end(), same), lastHands_.end());
         } else
             lastHands.emplace_back(shH);
+    }
+
+    for (ShortHand h : lastHands_) {
+        auto el = find(lastHands.begin(), lastHands.end(), h);
+        ShortHand &vH = *el;
+        if (vH.border.x == 0 && vH.border.y == 0)
+            lastHands.erase(el);
+        if (h.nfFrames < maxNFFrames) {
+            vH.nfFrames++;
+            *el = vH;
+        } else
+            lastHands.erase(el);
     }
 }
 

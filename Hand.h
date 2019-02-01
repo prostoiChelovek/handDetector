@@ -23,6 +23,8 @@ struct ShortHand {
     Rect border;
     int filtersIndex;
     vector<ShortFinger> fingers;
+    // number of frames where it were not found
+    int nfFrames = 0;
 };
 
 

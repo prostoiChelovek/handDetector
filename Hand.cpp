@@ -21,11 +21,9 @@ bool ShortHand::operator==(const ShortHand &b) {
         return false;
     if (fingers.size() != b.fingers.size())
         return false;
-    for (const ShortFinger &f : fingers) {
-        for (const ShortFinger &bF : b.fingers) {
-            if (f != bF)
-                return false;
-        }
+    for (int i = 0; i < fingers.size(); i++) {
+        if (fingers[i] != b.fingers[i])
+            return false;
     }
     return true;
 }

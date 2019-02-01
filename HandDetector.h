@@ -24,14 +24,17 @@ public:
     bool cascadeLoaded = false;
 
     // Filter
-    Scalar processNoiseCov = Scalar::all(1e-1);
-    Scalar measurementNoiseCov = Scalar::all(1e-1);
+    Scalar processNoiseCov = Scalar::all(1e-2);
+    Scalar measurementNoiseCov = Scalar::all(1e-2);
     Scalar errorCovPost = Scalar::all(.3);
     vector<vector<Filter>> filters;
 
     bool shouldBlur = true;
     bool shouldCheckSize = true;
     bool shouldCheckAngles = true;
+
+    // number of frames on which the hand was not found so that it was deleted
+    int maxNFFrames = 100;
 
     HandDetector() = default;
 
