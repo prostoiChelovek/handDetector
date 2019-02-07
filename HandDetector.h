@@ -36,6 +36,8 @@ public:
     // number of frames on which the hand was not found so that it was deleted
     int maxNFFrames = 100;
 
+    vector<ShortHand> lastHands;
+
     HandDetector() = default;
 
     void findHandsContours(Mat img);
@@ -66,8 +68,6 @@ public:
 
     void drawHands(Mat &img, Scalar color = Scalar(255, 0, 100), int thickness = 2);
 
-private:
-    vector<ShortHand> lastHands;
 };
 
 

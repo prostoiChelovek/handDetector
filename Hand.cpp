@@ -86,11 +86,11 @@ void Hand::getFingers() {
 }
 
 void Hand::getHigherFinger() {
-    Point higher(-1, -1);
+    int maxY = -1;
     Finger hf;
     for (Finger &f : fingers) {
-        if (f.ptStart.y < higher.y) {
-            higher = f.ptStart;
+        if (maxY == -1 || f.ptStart.y < maxY) {
+            maxY = f.ptStart.y;
             hf = f;
         }
     }
