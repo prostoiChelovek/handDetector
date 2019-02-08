@@ -102,7 +102,7 @@ void Hand::getFarthestFinger() {
     double dist;
     Finger ff;
     for (Finger &f : fingers) {
-        dist = getDist(f.ptFar, f.ptEnd);
+        dist = getDist(f.ptStart, f.ptFar);
         if (dist > farthest) {
             farthest = dist;
             ff = f;
@@ -130,28 +130,31 @@ ShortHand Hand::getSame(const vector<ShortHand> &hands) const {
 }
 
 void Hand::getFingersIndexes(const vector<ShortFinger> &lastFingers_) {
-    int i = 0;
     vector<ShortFinger> lastFingers = lastFingers_;
-    vector<int> indexes;
+    int diff = 0;
     for (Finger &f : fingers) {
-        ShortFinger shF = f.getSame(lastFingers);
-        if (shF.index == -1) {
-            f.index = i;
+        diff += abs(int(getDist(f.ptStart, f.ptFar)) - (f.ptFar.y - f.ptStart.y));
+    }
+    if (!fingers.empty()) {
+        if (diff / int(fingers.size()) <= 45) {
+            sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
+                return a.ptStart.x < b.ptStart.x;
+            });
         } else {
+            sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
+                return a.ptStart.y < b.ptStart.y;
+            });
+        }
+    }
+    for (int i = 0; i < fingers.size(); i++) {
+        Finger &f = fingers[i];
+        ShortFinger shF = f.getSame(lastFingers);
+        if (shF.index == -1)
+            f.index = i;
+        else {
             f.index = shF.index;
+            lastFingers.erase(remove(lastFingers.begin(), lastFingers.end(), shF), lastFingers.end());
         }
-        if (find(indexes.begin(), indexes.end(), f.index) != indexes.end()) {
-            sort(indexes.begin(), indexes.end());
-            for (int j = 0; j < maxFingers; j++) {
-                if (find(indexes.begin(), indexes.end(), j) == indexes.end()) {
-                    f.index = j;
-                    break;
-                }
-            }
-        }
-        indexes.emplace_back(f.index);
-        lastFingers.erase(remove(lastFingers.begin(), lastFingers.end(), shF), lastFingers.end());
-        i++;
     }
 }
 
