@@ -19,7 +19,6 @@ Filter::Filter(int stateSize_, int measSize_,
     KF.processNoiseCov.at<float>(5) = 1e-2;
     KF.processNoiseCov.at<float>(10) = 5.0f;
     KF.processNoiseCov.at<float>(15) = 5.0f;
-    setIdentity(KF.measurementNoiseCov, Scalar(1e-1));
     Mat_<float> measurement(2, 1);
     measurement.setTo(Scalar(0));
     setIdentity(KF.measurementMatrix);

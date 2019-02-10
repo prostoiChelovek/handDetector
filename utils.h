@@ -12,4 +12,7 @@ double getDist(Point a, Point b);
 
 void mask_morph(Mat &mask);
 
+Mat deleteBg(Mat img, Mat &out, Ptr<BackgroundSubtractor> bgs, bool learn = false,
+             int thresh_sens_val = 20);
+
 #endif //HANDDETECTOR_UTILS_H

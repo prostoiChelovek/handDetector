@@ -44,8 +44,6 @@ public:
 
     bool loadCascade(String path);
 
-    Mat deleteBg(Mat img, Mat bg, Mat &out);
-
     Mat detectHands_range(Mat img, Scalar lower, Scalar upper);
     void detectHands_Cascade(Mat img);
 

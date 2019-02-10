@@ -25,21 +25,6 @@ bool HandDetector::loadCascade(String path) {
     return !cascade.empty();
 }
 
-Mat HandDetector::deleteBg(Mat img, Mat bg, Mat &out) {
-    Mat deltaImg;
-    absdiff(img, bg, deltaImg);
-
-    Mat grayscale, threshDiff;
-    cvtColor(deltaImg, grayscale, CV_BGR2GRAY);
-    threshold(grayscale, threshDiff, thresh_sens_val, 255, THRESH_BINARY);
-    mask_morph(threshDiff);
-
-    Mat res;
-    img.copyTo(res, threshDiff);
-    out = res;
-    return threshDiff;
-}
-
 Mat HandDetector::detectHands_range(Mat img, Scalar lower, Scalar upper) {
     hands.clear();
     Mat mask;

@@ -14,19 +14,21 @@ int main()
         return EXIT_FAILURE;
     }
 
-    Mat frame, img, blur, bg, imgYCrCb, mask;
+    Mat frame, img, blur, imgYCrCb, mask;
 
     Scalar lower = Scalar(0, 135, 90);
     Scalar upper = Scalar(255, 230, 150);
 
-    cap >> bg;
+    Ptr<BackgroundSubtractor> bgs = createBackgroundSubtractorMOG2();
+    bool bgs_learn = true;
+    int bgs_learnNFrames = 100;
 
     while (cap.isOpened()) {
         cap >> frame;
         flip(frame, frame, 0);
         flip(frame, frame, 1);
 
-        hd.deleteBg(frame, bg, img);
+        deleteBg(frame, img, bgs, bgs_learn, hd.thresh_sens_val);
         cvtColor(img, imgYCrCb, COLOR_BGR2YCrCb);
         mask = hd.detectHands_range(imgYCrCb, lower, upper);
         hd.getFingers();
@@ -46,6 +48,13 @@ int main()
 
         hd.updateLast();
 
+        if (bgs_learnNFrames > 0)
+            bgs_learnNFrames--;
+        else if (bgs_learn) {
+            bgs_learn = false;
+            cout << "Background learned" << endl;
+        }
+
         char key = waitKeyEx(1);
         if (key != -1) {
             switch (key) {
@@ -53,13 +62,12 @@ int main()
                     cout << "exit" << endl;
                     return EXIT_SUCCESS;
                 case 'b': // change bg
-                    cap >> bg;
-                    flip(bg, bg, 0);
-                    flip(bg, bg, 1);
-                    cout << "Background changed." << endl;
+                    bgs_learnNFrames = 100;
+                    bgs_learn = true;
+                    cout << "Starting learning background." << endl;
                     break;
                 default:
-                    printf("Key presed: %c\n", key);
+                    printf("Key pressed: %c\n", key);
                     break;
             }
         }

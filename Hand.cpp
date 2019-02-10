@@ -80,9 +80,8 @@ void Hand::getFingers() {
             fingers.push_back(f);
     }
     removeCloseFingertips();
-    if (maxFingers != -1 && fingers.size() > maxFingers) {
-        fingers.erase(fingers.begin() + maxFingers - 1);
-    }
+    if (maxFingers != -1 && fingers.size() > maxFingers)
+        fingers.resize(maxFingers);
 }
 
 void Hand::getHigherFinger() {

@@ -23,3 +23,17 @@ void mask_morph(Mat &mask) {
     dilate(mask, mask, dilateElement);
     dilate(mask, mask, dilateElement);
 }
+
+Mat deleteBg(Mat img, Mat &out, Ptr<BackgroundSubtractor> bgs, bool learn, int thresh_sens_val) {
+    Mat fgMask, grayscale, threshDiff;
+    bgs->apply(img, fgMask, learn);
+
+    threshold(fgMask, threshDiff, thresh_sens_val, 255, THRESH_BINARY);
+    mask_morph(threshDiff);
+
+    Mat res;
+    img.copyTo(res, threshDiff);
+    out = res;
+
+    return threshDiff;
+}
