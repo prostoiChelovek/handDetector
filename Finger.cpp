@@ -21,18 +21,12 @@ bool ShortFinger::operator!=(const ShortFinger &b) const {
 
 Finger::Finger() = default;
 
-Finger::Finger(const Vec4i &defect, const vector<Point> &cnt, const Rect &boundingBox_,
-               bool shouldCheckAngles_, bool shouldCheckDist_, int index_) {
-    boundingBox = boundingBox_;
+Finger::Finger(const Vec4i &defect, const vector<Point> &cnt, const Rect &boundingBox,
+               bool shouldCheckAngles, bool shouldCheckDist, int index)
+        : boundingBox(boundingBox), shouldCheckAngles(shouldCheckAngles),
+          shouldCheckDist(shouldCheckDist), index(index) {
     depth = defect[3] / 256;
-
-    shouldCheckAngles = shouldCheckAngles_;
-    shouldCheckDist = shouldCheckDist_;
-
-    index = index_;
-
     getPoints(cnt, defect);
-
     check();
 }
 

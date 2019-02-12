@@ -29,15 +29,13 @@ bool ShortHand::operator==(const ShortHand &b) {
 }
 
 
-Hand::Hand(vector<Point> contour_, bool shouldCheckSize_, bool shouldCheckAngles_,
-           bool shouldCheckDists_) {
-    contour = move(contour_);
+Hand::Hand(vector<Point> contour, bool shouldCheckSize, bool shouldCheckAngles,
+           bool shouldGetLast, bool shouldCheckDists)
+        : contour(contour), shouldCheckSize(shouldCheckSize), shouldCheckAngles(shouldCheckAngles),
+          shouldGetLast(shouldGetLast), shouldCheckDists(shouldCheckDists) {
     moment = moments(contour);
     area = moment.m00;
     border = boundingRect(contour);
-    shouldCheckSize = shouldCheckSize_;
-    shouldCheckAngles = shouldCheckAngles_;
-    shouldCheckDists = shouldCheckDists_;
 }
 
 bool Hand::checkSize() {
@@ -65,7 +63,7 @@ void Hand::getCenter() {
     center = Point(moment.m10 / area, moment.m01 / area);
 }
 
-void Hand::getFingers() {
+void Hand::getFingers(const vector<ShortFinger> &lastFingers) {
     if (contour.empty()) {
         ok = false;
         return;
@@ -82,6 +80,21 @@ void Hand::getFingers() {
     removeCloseFingertips();
     if (maxFingers != -1 && fingers.size() > maxFingers)
         fingers.resize(maxFingers);
+    getFingersIndexes(lastFingers);
+    if (shouldGetLast) {
+        if (maxFingers != -1 && fingers.size() < maxFingers && !fingers.empty()) {
+            sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
+                return a.index < b.index;
+            });
+            Finger f = fingers[0];
+            f.ptStart = f.ptEnd;
+            f.ptEnd = f.ptStart;
+            fingers.insert(fingers.begin(), f);
+            for (int i = 0; i < fingers.size(); i++) {
+                fingers[i].index = i;
+            }
+        }
+    }
 }
 
 void Hand::getHigherFinger() {

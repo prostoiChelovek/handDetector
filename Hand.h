@@ -57,12 +57,14 @@ public:
     bool shouldCheckSize = true;
     bool shouldCheckAngles = true;
     bool shouldCheckDists = true; // check distance between fingertips
+    bool shouldGetLast = true;
 
     // index of filters in handDetector`s vector
     int filtersIndex = -1;
 
-    explicit Hand(vector<Point> contour_, bool shouldCheckSize_ = true,
-                  bool shouldCheckAngles_ = true, bool shouldCheckDists_ = true);
+    explicit Hand(vector<Point> contour, bool shouldCheckSize = true,
+                  bool shouldCheckAngles = true, bool shouldGetLast = true,
+                  bool shouldCheckDists = true);
 
     bool checkSize();
 
@@ -70,7 +72,7 @@ public:
 
     void getCenter();
 
-    void getFingers();
+    void getFingers(const vector<ShortFinger> &lastFingers);
 
     void getHigherFinger();
     void getFarthestFinger();

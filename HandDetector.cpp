@@ -11,7 +11,7 @@ void HandDetector::findHandsContours(Mat img) {
     threshold(img, img, thresh_sens_val, 255, THRESH_BINARY);
     findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
     for (auto &contour : contours) {
-        Hand h(contour, shouldCheckSize, shouldCheckAngles);
+        Hand h(contour, shouldCheckSize, shouldCheckAngles, true, shouldGetLast);
         if (h.checkSize())
             hands.push_back(h);
     }
@@ -48,9 +48,8 @@ void HandDetector::detectHands_Cascade(Mat img) {
 
 void HandDetector::getFingers() {
     for (Hand &h : hands) {
-        h.getFingers();
         ShortHand shH = h.getSame(lastHands);
-        h.getFingersIndexes(shH.fingers);
+        h.getFingers(shH.fingers);
     }
     checkHands();
 }

@@ -32,6 +32,7 @@ public:
     bool shouldBlur = true;
     bool shouldCheckSize = true;
     bool shouldCheckAngles = true;
+    bool shouldGetLast = true; // get last finger of hand; do not use without shouldCheckAngles
 
     // number of frames on which the hand was not found so that it was deleted
     int maxNFFrames = 100;

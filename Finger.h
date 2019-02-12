@@ -46,8 +46,8 @@ public:
 
     Finger();
 
-    Finger(const Vec4i &defect, const vector<Point> &cnt, const Rect &boundingBox_,
-           bool shouldCheckAngles_ = true, bool shouldCheckDist_ = true, int index_ = -1);
+    Finger(const Vec4i &defect, const vector<Point> &cnt, const Rect &boundingBox,
+           bool shouldCheckAngles = true, bool shouldCheckDist = true, int index = -1);
 
     bool checkDepth();
     bool checkAngles();
