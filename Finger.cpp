@@ -106,4 +106,6 @@ void Finger::draw(Mat &img, Scalar color, int thickness, Scalar fingertipColor) 
     line(img, ptEnd, ptFar, color, thickness);
     circle(img, ptFar, 5, color, thickness);
     circle(img, ptStart, 10, fingertipColor, thickness);
+    putText(img, to_string(index), Point(ptStart.x + 10, ptStart.y - 10),
+            CV_FONT_HERSHEY_COMPLEX_SMALL, 1, fingertipColor);
 }

@@ -6,7 +6,7 @@
 
 using namespace cv;
 
-float getAngle(Point s, Point f, Point e);
+float getAngle(Point a, Point b, Point c);
 
 double getDist(Point a, Point b);
 

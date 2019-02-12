@@ -83,12 +83,9 @@ void Hand::getFingers(const vector<ShortFinger> &lastFingers) {
     getFingersIndexes(lastFingers);
     if (shouldGetLast) {
         if (maxFingers != -1 && fingers.size() < maxFingers && !fingers.empty()) {
-            sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
-                return a.index < b.index;
-            });
             Finger f = fingers[0];
             f.ptStart = f.ptEnd;
-            f.ptEnd = f.ptStart;
+            f.ptEnd = fingers[0].ptStart;
             fingers.insert(fingers.begin(), f);
             for (int i = 0; i < fingers.size(); i++) {
                 fingers[i].index = i;
@@ -154,7 +151,7 @@ void Hand::getFingersIndexes(const vector<ShortFinger> &lastFingers_) {
             });
         } else {
             sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
-                return a.ptStart.y < b.ptStart.y;
+                return a.ptStart.y > b.ptStart.y;
             });
         }
     }
@@ -168,6 +165,9 @@ void Hand::getFingersIndexes(const vector<ShortFinger> &lastFingers_) {
             lastFingers.erase(remove(lastFingers.begin(), lastFingers.end(), shF), lastFingers.end());
         }
     }
+    sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
+        return a.index < b.index;
+    });
 }
 
 void Hand::updateFilters(vector<Filter> &filters) {
@@ -191,12 +191,13 @@ void Hand::drawFingers(Mat &img, Scalar color, int thickness) {
         f.draw(img, color, thickness);
         circle(img, higherFinger.ptStart, 10, Scalar(0, 0, 255), thickness);
         circle(img, farthestFinger.ptStart, 10, Scalar(0, 255, 255), thickness);
+        line(img, center, f.ptStart, color);
     }
 }
 
 void Hand::draw(Mat &img, Scalar color, int thickness) {
-    drawFingers(img, color, thickness);
     rectangle(img, border, color, thickness);
     if (center.x != -1)
         circle(img, center, 3, color, CV_FILLED);
+    drawFingers(img, color, thickness);
 }

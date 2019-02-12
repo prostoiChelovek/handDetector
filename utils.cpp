@@ -6,10 +6,10 @@ double getDist(Point a, Point b) {
     return sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
 }
 
-float getAngle(Point s, Point f, Point e) {
-    float l1 = getDist(f, s);
-    float l2 = getDist(f, e);
-    float dot = (s.x - f.x) * (e.x - f.x) + (s.y - f.y) * (e.y - f.y);
+float getAngle(Point a, Point b, Point c) {
+    float l1 = getDist(b, a);
+    float l2 = getDist(b, c);
+    float dot = (a.x - b.x) * (c.x - b.x) + (a.y - b.y) * (c.y - b.y);
     float angle = acos(dot / (l1 * l2));
     angle = angle * 180 / CV_PI;
     return angle;
