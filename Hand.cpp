@@ -30,9 +30,9 @@ bool ShortHand::operator==(const ShortHand &b) {
 
 
 Hand::Hand(vector<Point> contour, bool shouldCheckSize, bool shouldCheckAngles,
-           bool shouldGetLast, bool shouldCheckDists)
+           bool shouldGetLast, int maxAngle, bool shouldCheckDists)
         : contour(contour), shouldCheckSize(shouldCheckSize), shouldCheckAngles(shouldCheckAngles),
-          shouldGetLast(shouldGetLast), shouldCheckDists(shouldCheckDists) {
+          shouldGetLast(shouldGetLast), maxAngle(maxAngle), shouldCheckDists(shouldCheckDists) {
     moment = moments(contour);
     area = moment.m00;
     border = boundingRect(contour);
@@ -63,7 +63,7 @@ void Hand::getCenter() {
     center = Point(moment.m10 / area, moment.m01 / area);
 }
 
-void Hand::getFingers() {
+void Hand::getFingers(const vector<ShortFinger> &lastFingers) {
     if (contour.empty()) {
         ok = false;
         return;
@@ -73,22 +73,23 @@ void Hand::getFingers() {
     convexityDefects(contour, hullI, defects);
 
     for (const Vec4i &v : defects) {
-        Finger f(v, contour, border, shouldCheckAngles);
+        Finger f(v, contour, border, maxAngle, shouldCheckAngles);
         if (f.ok)
             fingers.push_back(f);
     }
     removeCloseFingertips();
     getCenter();
-    getFingersIndexes();
-
+    getFingersIndexes(lastFingers);
     if (maxFingers != -1 && fingers.size() > maxFingers)
         fingers.resize(maxFingers);
 
     if (shouldGetLast) {
         if (maxFingers != -1 && fingers.size() < maxFingers) {
             for (const Finger &f : fingers) {
+                if (maxFingers != -1 && fingers.size() >= maxFingers)
+                    break;
                 auto fnd = find_if(fingers.begin(), fingers.end(), [f](const Finger &b) {
-                    return getDist(f.ptEnd, b.ptStart) <= 35;
+                    return getDist(f.ptEnd, b.ptStart) <= 65;
                 });
                 if (fnd != fingers.end())
                     continue;
@@ -96,11 +97,16 @@ void Hand::getFingers() {
                 Finger nf = f;
                 nf.ptStart = f.ptEnd;
                 nf.ptEnd = f.ptStart;
-                fingers.insert(fingers.begin(), nf);
-                for (int i = f.index; i < fingers.size(); i++) {
-                    fingers[i].index = i;
+                for (int i = maxFingers; i >= 0; i--) {
+                    auto fnd = find_if(fingers.begin(), fingers.end(), [i](const Finger &a) {
+                        return a.index == i;
+                    });
+                    if (fnd == fingers.end()) {
+                        nf.index = i;
+                        break;
+                    }
                 }
-                break;
+                fingers.emplace_back(nf);
             }
         }
     }
@@ -150,7 +156,7 @@ ShortHand Hand::getSame(const vector<ShortHand> &hands) const {
     return res;
 }
 
-void Hand::getFingersIndexes() {
+void Hand::getFingersIndexes(const vector<ShortFinger> &lastFingers) {
     using fingersIt = vector<Finger>::iterator;
     vector<pair<float, fingersIt>> angles;
 
@@ -166,10 +172,31 @@ void Hand::getFingersIndexes() {
              return a.first < b.first;
          });
 
-    for (int i = 0; i < angles.size(); i++) {
-        Finger &f = *angles[i].second;
-        f.index = i;
-        f.hndAngle = angles[i].first;
+    // maybe, it is not the best way, but it works and i`m tired
+    vector<int> existInds;
+    for (const auto &a : angles) {
+        Finger &f = *a.second;
+        f.hndAngle = a.first;
+        ShortFinger lastF = f.getSame(lastFingers);
+        if (lastF.index != -1) {
+            if (find(existInds.begin(), existInds.end(), lastF.index) != existInds.end())
+                continue;
+            f.index = lastF.index;
+            existInds.emplace_back(f.index);
+        }
+    }
+    int i = 0;
+    for (auto &a : angles) {
+        Finger &f = *a.second;
+        if (f.index != -1)
+            continue;
+        for (; i < angles.size(); i++) {
+            if (find(existInds.begin(), existInds.end(), i) == existInds.end()) {
+                f.index = i;
+                existInds.emplace_back(i);
+                break;
+            }
+        }
     }
     sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
         return a.index < b.index;

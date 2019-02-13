@@ -46,6 +46,7 @@ public:
     // set to -1 to not check
     int maxFingers = 5;
     int maxAspectRatio = 4;
+    int maxAngle = 125;
 
     int minFTDist = 10; // min distance between fingertips
 
@@ -63,7 +64,7 @@ public:
     int filtersIndex = -1;
 
     explicit Hand(vector<Point> contour, bool shouldCheckSize = true,
-                  bool shouldCheckAngles = true, bool shouldGetLast = true,
+                  bool shouldCheckAngles = true, bool shouldGetLast = true, int maxAngle = 125,
                   bool shouldCheckDists = true);
 
     bool checkSize();
@@ -72,14 +73,14 @@ public:
 
     void getCenter();
 
-    void getFingers();
+    void getFingers(const vector<ShortFinger> &lastFingers);
 
     void getHigherFinger();
     void getFarthestFinger();
 
     ShortHand getSame(const vector<ShortHand> &hands) const;
 
-    void getFingersIndexes();
+    void getFingersIndexes(const vector<ShortFinger> &lastFingers);
     void updateFilters(vector<Filter> &filters);
     void stabilizeFingers(vector<Filter> &filters);
 

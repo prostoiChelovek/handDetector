@@ -22,9 +22,9 @@ bool ShortFinger::operator!=(const ShortFinger &b) const {
 
 Finger::Finger() = default;
 
-Finger::Finger(const Vec4i &defect, const vector<Point> &cnt, const Rect &boundingBox,
+Finger::Finger(const Vec4i &defect, const vector<Point> &cnt, const Rect &boundingBox, int maxAngle,
                bool shouldCheckAngles, bool shouldCheckDist, int index)
-        : boundingBox(boundingBox), shouldCheckAngles(shouldCheckAngles),
+        : boundingBox(boundingBox), maxAngle(maxAngle), shouldCheckAngles(shouldCheckAngles),
           shouldCheckDist(shouldCheckDist), index(index) {
     depth = defect[3] / 256;
     getPoints(cnt, defect);
@@ -48,7 +48,7 @@ bool Finger::checkDists() {
         return true;
 
     int minDist = boundingBox.height / 5;
-    int maxDist = minDist * 3;
+    int maxDist = minDist * 3.5;
 
     int d1 = getDist(ptStart, ptFar);
     int d2 = getDist(ptEnd, ptFar);
@@ -79,6 +79,7 @@ ShortFinger Finger::getSame(const vector<ShortFinger> &fingers) {
     for (const ShortFinger &fn : fingers) {
         int crDist = abs((getDist(ptFar, ptStart) + getDist(ptEnd, ptStart))
                          - (getDist(fn.ptFar, fn.ptStart) + getDist(fn.ptEnd, fn.ptStart)));
+        crDist += getDist(ptStart, fn.ptStart);
         if (hndAngle != -1 && fn.hndAngle != -1)
             crDist += abs(hndAngle - fn.hndAngle) * 5;
 
