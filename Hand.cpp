@@ -85,13 +85,22 @@ void Hand::getFingers() {
         fingers.resize(maxFingers);
 
     if (shouldGetLast) {
-        if (maxFingers != -1 && fingers.size() < maxFingers && !fingers.empty()) {
-            Finger f = fingers[0];
-            f.ptStart = f.ptEnd;
-            f.ptEnd = fingers[0].ptStart;
-            fingers.insert(fingers.begin(), f);
-            for (int i = 0; i < fingers.size(); i++) {
-                fingers[i].index = i;
+        if (maxFingers != -1 && fingers.size() < maxFingers) {
+            for (const Finger &f : fingers) {
+                auto fnd = find_if(fingers.begin(), fingers.end(), [f](const Finger &b) {
+                    return getDist(f.ptEnd, b.ptStart) <= 35;
+                });
+                if (fnd != fingers.end())
+                    continue;
+
+                Finger nf = f;
+                nf.ptStart = f.ptEnd;
+                nf.ptEnd = f.ptStart;
+                fingers.insert(fingers.begin(), nf);
+                for (int i = f.index; i < fingers.size(); i++) {
+                    fingers[i].index = i;
+                }
+                break;
             }
         }
     }
