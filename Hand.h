@@ -79,7 +79,7 @@ public:
 
     ShortHand getSame(const vector<ShortHand> &hands) const;
 
-    void getFingersIndexes(const vector<ShortFinger> &lastFingers_);
+    void getFingersIndexes();
     void updateFilters(vector<Filter> &filters);
     void stabilizeFingers(vector<Filter> &filters);
 

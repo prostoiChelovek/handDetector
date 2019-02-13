@@ -78,9 +78,12 @@ void Hand::getFingers(const vector<ShortFinger> &lastFingers) {
             fingers.push_back(f);
     }
     removeCloseFingertips();
+    getCenter();
+    getFingersIndexes();
+
     if (maxFingers != -1 && fingers.size() > maxFingers)
         fingers.resize(maxFingers);
-    getFingersIndexes(lastFingers);
+
     if (shouldGetLast) {
         if (maxFingers != -1 && fingers.size() < maxFingers && !fingers.empty()) {
             Finger f = fingers[0];
@@ -138,32 +141,25 @@ ShortHand Hand::getSame(const vector<ShortHand> &hands) const {
     return res;
 }
 
-void Hand::getFingersIndexes(const vector<ShortFinger> &lastFingers_) {
-    vector<ShortFinger> lastFingers = lastFingers_;
-    int diff = 0;
-    for (Finger &f : fingers) {
-        diff += abs(int(getDist(f.ptStart, f.ptFar)) - (f.ptFar.y - f.ptStart.y));
-    }
-    if (!fingers.empty()) {
-        if (diff / int(fingers.size()) <= 45) {
-            sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
-                return a.ptStart.x < b.ptStart.x;
-            });
-        } else {
-            sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
-                return a.ptStart.y > b.ptStart.y;
-            });
+void Hand::getFingersIndexes() {
+    using fingersIt = vector<Finger>::iterator;
+    vector<pair<float, fingersIt>> angles;
+
+    for (auto f = fingers.begin(); f < fingers.end(); f++) {
+        float angle = getAngle(Point(0, center.y), center, (*f).ptFar);
+        if ((*f).ptFar.y > center.y) {
+            angle = -angle;
         }
+        angles.emplace_back(angle, f);
     }
-    for (int i = 0; i < fingers.size(); i++) {
-        Finger &f = fingers[i];
-        ShortFinger shF = f.getSame(lastFingers);
-        if (shF.index == -1)
-            f.index = i;
-        else {
-            f.index = shF.index;
-            lastFingers.erase(remove(lastFingers.begin(), lastFingers.end(), shF), lastFingers.end());
-        }
+    sort(angles.begin(), angles.end(),
+         [](const pair<float, fingersIt> &a, const pair<float, fingersIt> &b) {
+             return a.first < b.first;
+         });
+
+    for (int i = 0; i < angles.size(); i++) {
+        Finger &f = *angles[i].second;
+        f.index = i;
     }
     sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
         return a.index < b.index;
@@ -191,7 +187,6 @@ void Hand::drawFingers(Mat &img, Scalar color, int thickness) {
         f.draw(img, color, thickness);
         circle(img, higherFinger.ptStart, 10, Scalar(0, 0, 255), thickness);
         circle(img, farthestFinger.ptStart, 10, Scalar(0, 255, 255), thickness);
-        line(img, center, f.ptStart, color);
     }
 }
 

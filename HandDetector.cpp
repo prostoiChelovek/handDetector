@@ -86,7 +86,7 @@ void HandDetector::initFilters() {
     vector<int> indexes;
     for (Hand &h : hands) {
         ShortHand shH = h.getSame(lastHands_);
-        if (shH.filtersIndex == -1 && h.filtersIndex == -1 || shH.filtersIndex >= filters.size()) {
+        if ((shH.filtersIndex == -1 && h.filtersIndex == -1) || shH.filtersIndex >= filters.size()) {
             filters.emplace_back(vector<Filter>{});
             h.filtersIndex = filters.size() - 1;
             vector<Filter> &fltr = filters[h.filtersIndex];

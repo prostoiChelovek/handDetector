@@ -37,7 +37,6 @@ int main()
         hd.updateFilters();
         hd.stabilize();
 
-        hd.getCenters();
         hd.getHigherFingers();
         hd.getFarthestFingers();
 

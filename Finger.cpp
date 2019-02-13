@@ -74,7 +74,7 @@ ShortFinger Finger::getSame(const vector<ShortFinger> &fingers) {
         int crDist = getDist(fn.ptStart, ptStart) +
                      getDist(fn.ptEnd, ptEnd) +
                      getDist(fn.ptFar, ptFar);
-        if (minDist == NULL || crDist < minDist && crDist <= 350) {
+        if ((minDist == NULL || crDist < minDist) && crDist <= 350) {
             minDist = crDist;
             res = fn;
         }

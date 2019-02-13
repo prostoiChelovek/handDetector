@@ -34,4 +34,4 @@ install(FILES ${headers} DESTINATION include/handDetector)
 
 add_executable(handDetector ${SOURCE_FILES})
 target_link_libraries(handDetector ${OpenCV_LIBS})
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-sign-compare")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-sign-compare -Wno-narrowing")
