@@ -48,8 +48,14 @@ bool Finger::checkDists() {
         return true;
 
     int minDist = boundingBox.height / 5;
+    int maxDist = minDist * 3;
 
-    ok = (getDist(ptStart, ptFar) > minDist && getDist(ptEnd, ptFar) > minDist);
+    int d1 = getDist(ptStart, ptFar);
+    int d2 = getDist(ptEnd, ptFar);
+    int d3 = getDist(ptStart, ptEnd);
+
+    ok = (d1 > minDist && d2 > minDist)
+         && (d3 < maxDist);
     return ok;
 }
 
