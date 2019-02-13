@@ -48,8 +48,7 @@ void HandDetector::detectHands_Cascade(Mat img) {
 
 void HandDetector::getFingers() {
     for (Hand &h : hands) {
-        ShortHand shH = h.getSame(lastHands);
-        h.getFingers(shH.fingers);
+        h.getFingers();
     }
     checkHands();
 }
@@ -131,6 +130,7 @@ void HandDetector::updateLast() {
                     f.ptStart,
                     f.ptEnd,
                     f.ptFar,
+                    f.hndAngle,
                     f.index
             };
             shH.fingers.emplace_back(shF);

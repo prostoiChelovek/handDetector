@@ -2,10 +2,11 @@
 
 ShortFinger::ShortFinger() {
     index = -1;
+    hndAngle = -1;
 }
 
-ShortFinger::ShortFinger(const Point &ptStart, Point ptEnd, Point ptFar, int index)
-        : ptStart(ptStart), ptEnd(ptEnd), ptFar(ptFar), index(index) {}
+ShortFinger::ShortFinger(const Point &ptStart, Point ptEnd, Point ptFar, int hndAngle, int index)
+        : ptStart(ptStart), ptEnd(ptEnd), ptFar(ptFar), hndAngle(hndAngle), index(index) {}
 
 bool ShortFinger::operator==(const ShortFinger &b) const {
     return index == b.index &&
@@ -38,7 +39,6 @@ bool Finger::checkDepth() {
 bool Finger::checkAngles() {
     if (!shouldCheckAngles)
         return true;
-
     ok = (getAngle(ptStart, ptFar, ptEnd) < maxAngle);
     return ok;
 }
@@ -68,13 +68,15 @@ void Finger::getPoints(vector<Point> cnt, Vec4i v) {
 }
 
 ShortFinger Finger::getSame(const vector<ShortFinger> &fingers) {
-    int minDist = NULL;
+    int minDist = -1;
     ShortFinger res;
     for (const ShortFinger &fn : fingers) {
-        int crDist = getDist(fn.ptStart, ptStart) +
-                     getDist(fn.ptEnd, ptEnd) +
-                     getDist(fn.ptFar, ptFar);
-        if ((minDist == NULL || crDist < minDist) && crDist <= 350) {
+        int crDist = abs((getDist(ptFar, ptStart) + getDist(ptEnd, ptStart))
+                         - (getDist(fn.ptFar, fn.ptStart) + getDist(fn.ptEnd, fn.ptStart)));
+        if (hndAngle != -1 && fn.hndAngle != -1)
+            crDist += abs(hndAngle - fn.hndAngle) * 5;
+
+        if (minDist == -1 || crDist < minDist) {
             minDist = crDist;
             res = fn;
         }
@@ -107,5 +109,5 @@ void Finger::draw(Mat &img, Scalar color, int thickness, Scalar fingertipColor) 
     circle(img, ptFar, 5, color, thickness);
     circle(img, ptStart, 10, fingertipColor, thickness);
     putText(img, to_string(index), Point(ptStart.x + 10, ptStart.y - 10),
-            CV_FONT_HERSHEY_COMPLEX_SMALL, 1, fingertipColor);
+            CV_FONT_HERSHEY_COMPLEX_SMALL, 0.6, fingertipColor);
 }

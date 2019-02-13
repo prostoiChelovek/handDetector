@@ -63,7 +63,7 @@ void Hand::getCenter() {
     center = Point(moment.m10 / area, moment.m01 / area);
 }
 
-void Hand::getFingers(const vector<ShortFinger> &lastFingers) {
+void Hand::getFingers() {
     if (contour.empty()) {
         ok = false;
         return;
@@ -124,7 +124,7 @@ void Hand::getFarthestFinger() {
 }
 
 ShortHand Hand::getSame(const vector<ShortHand> &hands) const {
-    int minDiff = NULL;
+    int minDiff = -1;
     ShortHand res;
     for (const ShortHand &h : hands) {
         int diff = 0;
@@ -133,7 +133,7 @@ ShortHand Hand::getSame(const vector<ShortHand> &hands) const {
         diff += abs(h.border.width - border.width);
         diff += abs(h.border.height - border.height);
         diff += (filtersIndex == h.filtersIndex ? -25 : 25);
-        if (minDiff == NULL || diff < minDiff) {
+        if (minDiff == -1 || diff < minDiff) {
             minDiff = diff;
             res = h;
         }
@@ -160,6 +160,7 @@ void Hand::getFingersIndexes() {
     for (int i = 0; i < angles.size(); i++) {
         Finger &f = *angles[i].second;
         f.index = i;
+        f.hndAngle = angles[i].first;
     }
     sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
         return a.index < b.index;

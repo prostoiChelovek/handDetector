@@ -13,7 +13,7 @@ using namespace std;
 struct ShortFinger {
     ShortFinger();
 
-    ShortFinger(const Point &ptStart, Point ptEnd, Point ptFar, int index = -1);
+    ShortFinger(const Point &ptStart, Point ptEnd, Point ptFar, int hndAnggle = -1, int index = -1);
 
     bool operator==(const ShortFinger &b) const;
 
@@ -23,6 +23,7 @@ struct ShortFinger {
     Point ptEnd;
     Point ptFar;
     int index;
+    int hndAngle;
 };
 
 class Finger {
@@ -32,7 +33,7 @@ public:
 
     float depth;
 
-    float maxAngle = 95;
+    float maxAngle = 125;
     int minDepth = 11;
 
     bool ok = false;
@@ -41,6 +42,8 @@ public:
     bool shouldCheckDist = true; // check distance between ptStart, ptFar and ptEnd;
 
     int index = -1;
+
+    int hndAngle = -1;
 
     Rect boundingBox; // hand`s
 

@@ -72,7 +72,7 @@ public:
 
     void getCenter();
 
-    void getFingers(const vector<ShortFinger> &lastFingers);
+    void getFingers();
 
     void getHigherFinger();
     void getFarthestFinger();
