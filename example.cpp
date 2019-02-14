@@ -54,7 +54,7 @@ int main()
             cout << "Background learned" << endl;
         }
 
-        char key = waitKeyEx(1);
+        char key = waitKey(1);
         if (key != -1) {
             switch (key) {
                 case 'q': // exit
