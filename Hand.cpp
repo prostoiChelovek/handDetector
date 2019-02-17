@@ -77,6 +77,9 @@ void Hand::getFingers(const vector<ShortFinger> &lastFingers) {
         if (f.ok)
             fingers.push_back(f);
     }
+    sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
+        return a.ptStart.y < b.ptStart.y;
+    });
     removeCloseFingertips();
     getCenter();
     getFingersIndexes(lastFingers);
@@ -89,7 +92,7 @@ void Hand::getFingers(const vector<ShortFinger> &lastFingers) {
                 if (maxFingers != -1 && fingers.size() >= maxFingers)
                     break;
                 auto fnd = find_if(fingers.begin(), fingers.end(), [f](const Finger &b) {
-                    return getDist(f.ptEnd, b.ptStart) <= 45;
+                    return getDist(f.ptEnd, b.ptStart) <= 50;
                 });
                 if (fnd != fingers.end())
                     continue;
@@ -110,15 +113,16 @@ void Hand::getFingersIndexes(const vector<ShortFinger> &lastFingers) {
 
     for (auto f = fingers.begin(); f < fingers.end(); f++) {
         float angle = getAngle(Point(0, center.y), center, (*f).ptFar);
-        if ((*f).ptFar.y > center.y) {
-            angle = -angle;
-        }
         angles.emplace_back(angle, f);
     }
     sort(angles.begin(), angles.end(),
          [](const pair<float, fingersIt> &a, const pair<float, fingersIt> &b) {
              return a.first < b.first;
          });
+    for (auto &a : angles) {
+        if ((*a.second).ptFar.y > center.y)
+            a.first = -a.first;
+    }
 
     // maybe, it is not the best way, but it works and i`m tired
     vector<int> existInds;
@@ -150,7 +154,7 @@ void Hand::getFingersIndexes(const vector<ShortFinger> &lastFingers) {
         }
     }
     sort(fingers.begin(), fingers.end(), [](const Finger &a, const Finger &b) {
-        return a.index < b.index;
+        return a.hndAngle < b.hndAngle;
     });
 }
 

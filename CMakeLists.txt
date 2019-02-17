@@ -17,7 +17,7 @@ add_library(handDetector_dynamic SHARED ${LIBHANDD_SRC})
 add_library(handDetector_static STATIC ${LIBHANDD_SRC})
 
 set_target_properties(handDetector_dynamic PROPERTIES OUTPUT_NAME "handDetector")
-set_target_properties(handDetector_dynamic PROPERTIES VERSION 1.2 SOVERSION 1)
+set_target_properties(handDetector_dynamic PROPERTIES VERSION 1.3 SOVERSION 1)
 
 set_target_properties(handDetector_static PROPERTIES OUTPUT_NAME "handDetector")
 
@@ -34,4 +34,4 @@ install(FILES ${headers} DESTINATION include/handDetector)
 
 add_executable(handDetector ${SOURCE_FILES})
 target_link_libraries(handDetector ${OpenCV_LIBS})
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-sign-compare -Wno-narrowing")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-sign-compare -Wno-narrowing -Wno-reorder")

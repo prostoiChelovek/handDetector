@@ -110,7 +110,6 @@ void Finger::stabilize(Filter &f) {
 }
 
 void Finger::draw(Mat &img, Scalar color, int thickness, Scalar fingertipColor) {
-    line(img, ptStart, ptEnd, color, thickness);
     line(img, ptStart, ptFar, color, thickness);
     line(img, ptEnd, ptFar, color, thickness);
     circle(img, ptFar, 5, color, thickness);
