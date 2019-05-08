@@ -229,6 +229,6 @@ void Hand::drawFingers(Mat &img, Scalar color, int thickness) {
 void Hand::draw(Mat &img, Scalar color, int thickness) {
     rectangle(img, border, color, thickness);
     if (center.x != -1)
-        circle(img, center, 3, color, CV_FILLED);
+        circle(img, center, 3, color, LineTypes::FILLED);
     drawFingers(img, color, thickness);
 }

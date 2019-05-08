@@ -9,7 +9,7 @@ void HandDetector::findHandsContours(Mat img) {
     if (shouldBlur)
         blur(img, img, blurKsize);
     threshold(img, img, thresh_sens_val, 255, THRESH_BINARY);
-    findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+    findContours(img, contours, RetrievalModes::RETR_CCOMP, ContourApproximationModes::CHAIN_APPROX_SIMPLE);
     for (auto &contour : contours) {
         Hand h(contour, shouldCheckSize, shouldCheckAngles, shouldGetLast, maxAngle);
         if (h.checkSize())
@@ -19,7 +19,7 @@ void HandDetector::findHandsContours(Mat img) {
 
 bool HandDetector::loadCascade(String path) {
     if (cascadePath.empty())
-        cascadePath = path;
+        cascadePath = std::move(path);
     cascade.load(cascadePath);
     cascadeLoaded = !cascade.empty();
     return !cascade.empty();
